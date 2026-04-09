@@ -1,3 +1,86 @@
+# AgriSpark
+
+AgriSpark is a React Native + Expo mobile app that connects farmers and bulk buyers (hotels, companies, wholesalers) for direct produce transactions.
+
+## Objective
+
+- Improve market access for farmers
+- Enable direct farmer-to-buyer transactions
+- Simplify bulk purchasing and order handling
+
+## Core Features
+
+- Authentication
+- Product management for farmers
+- Product browsing for buyers
+- Order management workflow
+- Admin oversight (planned)
+
+## Tech Stack
+
+- Frontend: React Native, Expo, Expo Router
+- Language: TypeScript
+
+## Local Development
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start the Expo dev server:
+
+```bash
+npm run start
+```
+
+Useful scripts:
+
+- `npm run android`
+- `npm run ios`
+- `npm run web`
+- `npm run lint`
+
+## Docker (Web Build)
+
+This repository includes a multi-stage Docker build that exports the Expo web app and serves it with Nginx.
+
+Build image:
+
+```bash
+docker build -t agrispark-web .
+```
+
+Run container:
+
+```bash
+docker run --rm -p 8080:80 agrispark-web
+```
+
+Then open http://localhost:8080.
+
+## System Design and Flows
+
+### Authentication Flow
+![Authentication Flow](images/Authentication%20Flow.png)
+
+### Buyer Browsing and Ordering Flow
+![Buyer Browsing and Ordering Flow](images/Buyer%20Browsing%20%26%20Ordering%20Flow.png)
+
+### Farmer Product Management Flow
+![Farmer Product Management Flow](images/Farmer%20Product%20Management%20Flow.png)
+
+### Order Management Flow (Farmer Side)
+![Order Management Flow (Farmer Side)](images/Order%20Management%20Flow%20(Farmer%20Side).png)
+
+### Full System End-to-End Flow
+![Full System End-to-End Flow](images/Full%20System%20End-to-End%20Flow.png)
+
+### Visual Design
+![Visual Design](images/Visual-design.png)
+
+
 ![GitHub stars](https://img.shields.io/github/stars/your-username/AgriSpark-App)
 ![GitHub forks](https://img.shields.io/github/forks/your-username/AgriSpark-App)
 ![License](https://img.shields.io/github/license/your-username/AgriSpark-App)
@@ -89,7 +172,5 @@ Below are the main design and flow diagrams for AgriSpark:
 ![Visual Design](images/Visual-design.png)
 
 ---
-
-            *end of README.md*
 
 

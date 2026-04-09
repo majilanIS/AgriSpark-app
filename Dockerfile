@@ -1,20 +1,18 @@
-git checkout -b chore/add-docker-support# Use official Node.js image as the base
-FROM node:18-alpine
+# Build stage: export Expo app for web
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install --production
-
-# Copy the rest of the application code
 COPY . .
+RUN npx expo export --platform web
 
-# Expose the port the app runs on (adjust if needed)
-EXPOSE 3000
+# Runtime stage: serve static web build
+FROM nginx:alpine
 
-# Start the application (adjust if needed)
-CMD ["npm", "start"]
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
