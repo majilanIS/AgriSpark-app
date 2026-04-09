@@ -88,4 +88,8 @@ Below are the main design and flow diagrams for AgriSpark:
 ### Visual Design
 ![Visual Design](images/Visual-design.png)
 
+---
+
+            *end of README.md*
+
 
