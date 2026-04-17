@@ -13,7 +13,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabaseClient";
-import Footer from "./components/landing-components/Footer";
 
 // ✅ Email validation
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,6 +26,7 @@ export default function LoginRegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  //data states entered by user
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
@@ -36,31 +36,40 @@ export default function LoginRegisterScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const resolveUserRole = async (user) => {
-    const metadataRole = user?.user_metadata?.role;
-
-    const { data: profile } = await supabase
+  const resolveUserRole = async (userId, fallbackRole) => {
+  const { data } = await supabase
       .from("users")
       .select("role")
-      .eq("id", user.id)
+      .eq("id", userId)
       .single();
 
-    if (profile?.role === "farmer") return "farmer";
-    if (profile?.role === "buyer") return "buyer";
-    if (metadataRole === "farmer") return "farmer";
-    if (metadataRole === "buyer") return "buyer";
-
-    return "buyer";
+    return data?.role || fallbackRole || "buyer";
   };
 
-  const redirectByRole = (resolvedRole) => {
-    if (resolvedRole === "farmer") {
-      router.replace("/farmer/home");
-      return;
-    }
+  const syncUserProfile = async (user) => {
+    const meta = user.user_metadata || {};
 
-    router.replace("/buyer/home");
+    const profile = {
+      id: user.id,
+      full_name: meta.full_name || "",
+      email: user.email,
+      role: meta.role || "buyer",
+      phone_number: meta.phone_number || "",
+      business_name: meta.business_name || "",
+      location: meta.location || "",
+    };
+
+    await supabase.from("users").upsert(profile);
   };
+
+  // const redirectByRole = (resolvedRole) => {
+  //   if (resolvedRole === "farmer") {
+  //     router.replace("/farmer/home");
+  //     return;
+  //   }
+
+  //   router.replace("/buyer/home");
+  // };
 
   // ✅ Mode + Session check
   useEffect(() => {
@@ -105,99 +114,46 @@ export default function LoginRegisterScreen() {
   //   return () => subscription.unsubscribe();
   }, [initialMode, router]);
 
-  // ✅ Sync profile
-  const syncUserProfile = async (user) => {
-    if (!user?.id) return;
-
-    const meta = user.user_metadata || {};
-
-    const { error } = await supabase.from("users").upsert(
-      {
-        id: user.id,
-        full_name: meta.full_name || "",
-        email: user.email || "",
-        phone_number: meta.phone_number || "",
-        role: meta.role || "buyer",
-        business_name: meta.business_name || "",
-        location: meta.location || "",
-      },
-      { onConflict: "id" }
-    );
-
-    if (error) throw error;
-  };
-
-  // ✅ REGISTER
   const handleRegister = async () => {
-    if (!fullName || !registerEmail || !password || !confirmPassword) {
-      Alert.alert("Missing fields", "Please fill all required fields.");
-      return;
-    }
+      if (!fullName || !registerEmail || !password || !confirmPassword) return;
 
-    if (!emailRegex.test(registerEmail)) {
-      Alert.alert("Invalid email", "Please enter a valid email address.");
-      return;
-    }
+      if (!emailRegex.test(registerEmail)) return;
+      if (password.length < 6) return;
+      if (password !== confirmPassword) return;
+      setIsSubmitting(true);
 
-    if (password.length < 6) {
-      Alert.alert("Weak password", "Password must be at least 6 characters.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert("Password mismatch", "Passwords do not match.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: registerEmail.trim().toLowerCase(),
-        password,
-        options: {
-          data: {
-            role,
-            full_name: fullName.trim(),
-            phone_number: phoneNumber.trim(),
-            business_name: businessName.trim(),
-            location: location.trim(),
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: registerEmail.trim().toLowerCase(),
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              role,
+              phone_number: phoneNumber,
+              business_name: businessName,
+              location,
+            },
           },
-        },
-      });
+        });
 
-      if (error) {
-        Alert.alert("Sign up failed", error.message);
-        return;
+        if (error) throw error;
+        if (data?.user) {
+          await syncUserProfile(data.user);
+        }
+
+        Alert.alert("Success", "Check your email to verify account.");
+        setMode("login");
+      } catch (err) {
+        Alert.alert("Error", err.message);
+      } finally {
+        setIsSubmitting(false);
       }
-
-      Alert.alert(
-        "Check your email",
-        "Please verify your email before logging in."
-      );
-
-      setMode("login");
-      setLoginIdentifier(registerEmail.trim().toLowerCase());
-      setPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      Alert.alert("Error", err?.message || "Unexpected error");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    };
 
   // ✅ LOGIN
-  const handleLogin = async () => {
-    if (!loginIdentifier || !password) {
-      Alert.alert("Missing fields", "Enter email and password.");
-      return;
-    }
-
-    if (!emailRegex.test(loginIdentifier)) {
-      Alert.alert("Invalid email", "Enter a valid email.");
-      return;
-    }
+ const handleLogin = async () => {
+    if (!loginIdentifier || !password) return;
 
     setIsSubmitting(true);
 
@@ -207,29 +163,18 @@ export default function LoginRegisterScreen() {
         password,
       });
 
-      if (error) {
-        Alert.alert("Login failed", error.message);
-        return;
-      }
+      if (error) throw error;
 
-      const user = data?.user;
+      const user = data.user;
+      if (!user) return;
 
-      if (!user) {
-        Alert.alert("Error", "No user found");
-        return;
-      }
+      await syncUserProfile(user);
 
-      // ✅ Sync profile
-      try {
-        await syncUserProfile(user);
-      } catch {
-        Alert.alert("Warning", "Profile sync failed");
-      }
+      const role = await resolveUserRole(user.id, user.user_metadata?.role);
 
-      const resolvedRole = await resolveUserRole(user);
-      redirectByRole(resolvedRole);
+      router.replace(role === "farmer" ? "/farmer/home" : "/buyer/home");
     } catch (err) {
-      Alert.alert("Login error", err?.message || "Unexpected error");
+      Alert.alert("Login failed", err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -457,8 +402,10 @@ export default function LoginRegisterScreen() {
               </Text>
             </Pressable>
         </View>
-
+        {/* <View>
         <Text style={styles.supportText}>Need help? support@agrispark.co</Text>
+        <Text>Full_Year.NOw()</Text>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
