@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "../../lib/supabaseClient";
 import {
   pickImageFromDevice,
@@ -18,6 +19,10 @@ import {
 } from "../../utils/ImageUpload";
 
 export default function FarmerCreateScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const editProductId = Array.isArray(params?.productId) ? params.productId[0] : params?.productId;
+
   const [category, setCategory] = useState("Vegetables");
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
@@ -33,6 +38,7 @@ export default function FarmerCreateScreen() {
 
   const [imageSource, setImageSource] = useState("url");
   const [saving, setSaving] = useState(false);
+  const [loadingProduct, setLoadingProduct] = useState(Boolean(editProductId));
 
   const categories = ["Vegetables", "Fruits", "Grains", "Dairy", "Livestock"];
 
@@ -65,14 +71,19 @@ export default function FarmerCreateScreen() {
   };
 
   const checkDuplicateProduct = async ({ farmerId, name, category, location }) => {
-    const { data: duplicateProduct, error } = await supabase
+    const query = supabase
       .from("products")
       .select("id, name, category, location")
       .eq("farmer_id", farmerId)
       .ilike("name", name)
       .ilike("category", category)
-      .ilike("location", location)
-      .maybeSingle();
+      .ilike("location", location);
+
+    if (editProductId) {
+      query.neq("id", editProductId);
+    }
+
+    const { data: duplicateProduct, error } = await query.maybeSingle();
 
     if (error) {
       throw error;
@@ -106,6 +117,47 @@ export default function FarmerCreateScreen() {
     setImageSource("upload");
     setImageUrl("");
   };
+
+  useEffect(() => {
+    const loadProductForEdit = async () => {
+      if (!editProductId) {
+        setLoadingProduct(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, name, category, description, price, quantity, location, image_url")
+          .eq("id", editProductId)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data?.id) {
+          throw new Error("Product not found.");
+        }
+
+        setProductName(data.name || "");
+        setDescription(data.description || "");
+        setPrice(String(data.price ?? ""));
+        setQuantity(String(data.quantity ?? ""));
+        setLocation(data.location || "");
+        setCategory(data.category || "Vegetables");
+        setImageUrl(data.image_url || "");
+        setImageSource("url");
+      } catch (error) {
+        Alert.alert("Edit failed", error?.message || "Could not load product.");
+        router.back();
+      } finally {
+        setLoadingProduct(false);
+      }
+    };
+
+    loadProductForEdit();
+  }, [editProductId, router]);
 
   // -----------------------------
   // SUBMIT PRODUCT
@@ -190,7 +242,7 @@ export default function FarmerCreateScreen() {
       // -----------------------------
       // INSERT PRODUCT
       // -----------------------------
-      const { error } = await supabase.from("products").insert({
+      const payload = {
         farmer_id: farmerId,
         name,
         category,
@@ -199,15 +251,21 @@ export default function FarmerCreateScreen() {
         quantity: qtyNum,
         location: loc,
         image_url: finalImageUrl,
-      });
+      };
+
+      const mutation = editProductId
+        ? supabase.from("products").update(payload).eq("id", editProductId)
+        : supabase.from("products").insert(payload);
+
+      const { error } = await mutation;
 
       if (error) {
-        console.log("[CreateProduct] Product insert failed", error?.message || error);
+        console.log("[CreateProduct] Product save failed", error?.message || error);
         throw error;
       }
 
-      console.log("[CreateProduct] Product published successfully");
-      Alert.alert("Success", "Product published successfully!");
+      console.log("[CreateProduct] Product saved successfully");
+      Alert.alert("Success", editProductId ? "Product updated successfully!" : "Product published successfully!");
 
       // -----------------------------
       // RESET FORM
@@ -224,6 +282,10 @@ export default function FarmerCreateScreen() {
       setLocalImageMimeType("image/jpeg");
       setImageSource("url");
       setCategory("Vegetables");
+
+      if (editProductId) {
+        router.back();
+      }
     } catch (err) {
       console.log("[CreateProduct] Publish failed", err?.message || err);
       if (uploadedFilePath) {
@@ -244,11 +306,21 @@ export default function FarmerCreateScreen() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.heroCard}>
         <Text style={styles.tag}>ADD PRODUCT</Text>
-        <Text style={styles.title}>List your farm product in a few steps.</Text>
+          <Text style={styles.title}>
+            {editProductId ? "Edit your farm product." : "List your farm product in a few steps."}
+          </Text>
         <Text style={styles.subtitle}>
-          Fill out the listing details, set your price, and publish a product buyers can discover.
+          {editProductId
+            ? "Update the product details and save the changes."
+            : "Fill out the listing details, set your price, and publish a product buyers can discover."}
         </Text>
       </View>
+
+      {loadingProduct ? (
+        <View style={styles.stepCard}>
+          <Text style={styles.subtitle}>Loading product...</Text>
+        </View>
+      ) : null}
 
       {/* STEP 1 */}
       <View style={styles.stepCard}>
@@ -361,7 +433,7 @@ export default function FarmerCreateScreen() {
         disabled={saving}
       >
         <Text style={{ color: "#fff", fontWeight: "800" }}>
-          {saving ? "Saving..." : "Publish Product"}
+          {saving ? "Saving..." : editProductId ? "Update Product" : "Publish Product"}
         </Text>
       </Pressable>
     </ScrollView>

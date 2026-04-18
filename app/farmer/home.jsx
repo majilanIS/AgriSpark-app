@@ -15,14 +15,25 @@ import { supabase } from "../../lib/supabaseClient";
 
 const lowStockThreshold = 5;
 
-// const quickActions = [
-//   { title: "Add Product", icon: "add-circle-outline", route: "/farmer/create" },
-//   { title: "Track Orders", icon: "cube-outline", route: "/farmer/orders" },
-//   { title: "My Products", icon: "leaf-outline", route: "/farmer/products" },
-// ];
-
 const formatMoney = (value) => {
   return `ETB ${Number(value || 0).toFixed(2)}`;
+};
+
+const resolveImageUrl = (value) => {
+  if (!value) return "";
+
+  const v = value.trim();
+
+  // If already full URL → return as is
+  if (v.startsWith("http")) return v;
+
+  // Clean path (remove leading slash + bucket name)
+  const path = v.replace(/^\/|^product-images\//g, "");
+
+  // Return public URL
+  return supabase.storage
+    .from("product-images")
+    .getPublicUrl(path).data.publicUrl;
 };
 
 export default function FarmerHomeScreen() {
@@ -67,7 +78,7 @@ export default function FarmerHomeScreen() {
 
     const { data: productRows, error: productError } = await supabase
       .from("products")
-      .select("id, name, category, quantity, price, location, created_at")
+      .select("id, name, category, quantity, price, location, image_url, created_at")
       .eq("farmer_id", userRow.id)
       .order("created_at", { ascending: false });
 
@@ -75,7 +86,12 @@ export default function FarmerHomeScreen() {
       throw productError;
     }
 
-    const safeProducts = productRows || [];
+    const safeProducts = await Promise.all(
+      (productRows || []).map(async (item) => ({
+        ...item,
+        resolved_image_url: resolveImageUrl(item.image_url),
+      }))
+    );
     setProducts(safeProducts);
 
     if (!safeProducts.length) {
@@ -179,6 +195,7 @@ export default function FarmerHomeScreen() {
   const recentProducts = products.slice(0, 4).map((item) => ({
     id: item.id,
     title: item.name,
+    imageUrl: item.resolved_image_url,
     due:
       Number(item.quantity || 0) <= lowStockThreshold
         ? `Low stock: ${item.quantity || 0} left`
@@ -207,10 +224,6 @@ export default function FarmerHomeScreen() {
               ? `Location: ${profile.location}`
               : "Monitor produce, orders, and revenue in one place."}
           </Text>
-          <Pressable style={styles.heroButton} onPress={() => router.push("/farmer/create")}>
-            <Ionicons name="sparkles-outline" size={16} color="#FFFFFF" />
-            <Text style={styles.heroButtonText}>Add Product</Text>
-          </Pressable>
         </View>
       </View>
 
@@ -253,9 +266,19 @@ export default function FarmerHomeScreen() {
           <Text style={styles.emptyText}>No products yet. Add your first listing.</Text>
         )}
         {recentProducts.map((item) => (
-          <View key={item.title} style={styles.taskRow}>
+          <View key={item.id} style={styles.taskRow}>
             <View style={[styles.dot, item.done && styles.dotDone]} />
             <View style={styles.taskTextWrap}>
+              {item.imageUrl ? (
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  style={styles.productThumb}
+                />
+              ) : (
+                <View style={styles.productThumbFallback}>
+                  <Ionicons name="image-outline" size={16} color="#7DA58A" />
+                </View>
+              )}
               <Text style={styles.taskTitle}>{item.title}</Text>
               <Text style={[styles.taskDue, item.done && styles.taskDone]}>{item.due}</Text>
             </View>
@@ -283,6 +306,7 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   hero: {
+    width: "100%",
     borderRadius: 22,
     overflow: "hidden",
     backgroundColor: "#123A1F",
@@ -443,15 +467,31 @@ const styles = StyleSheet.create({
   taskTextWrap: {
     flex: 1,
   },
+  productThumb: {
+    width: 120,
+    height: 80,
+    borderRadius: 6,
+    marginBottom: 4,
+    backgroundColor: "#EAF4E8",
+  },
+  productThumbFallback: {
+    width: 120,
+    height: 80,
+    borderRadius: 6,
+    marginBottom: 4,
+    backgroundColor: "#EAF4E8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   taskTitle: {
     fontWeight: "700",
     color: "#1F3B2B",
-    fontSize: 14,
+    fontSize: 20,
   },
   taskDue: {
     color: "#A36C09",
     marginTop: 2,
-    fontSize: 12,
+    fontSize: 16,
   },
   taskDone: {
     color: "#437B58",

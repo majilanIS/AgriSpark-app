@@ -255,7 +255,7 @@ export default function LoginRegisterScreen() {
             <>
               <Text style={styles.inputLabel}>Full Name</Text>
               <TextInput
-                placeholder="John Doe"
+                placeholder="abel tesfaye"
                 style={styles.input}
                 value={fullName}
                 onChangeText={setFullName}
@@ -263,7 +263,7 @@ export default function LoginRegisterScreen() {
 
               <Text style={styles.inputLabel}>Phone Number</Text>
               <TextInput
-                placeholder="+251 9XX XXX XXX"
+                placeholder="+251 945 977 754"
                 style={styles.input}
                 keyboardType="phone-pad"
                 value={phoneNumber}
@@ -272,12 +272,12 @@ export default function LoginRegisterScreen() {
 
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
-                placeholder="example@gmail.com"
+                placeholder="abeltesfaye@gmail.com"
                 style={styles.input}
                 value={registerEmail}
                 onChangeText={setRegisterEmail}
                 autoCapitalize="none"
-                keyboardType="email-address"
+                keyboardType="default"
               />
 
               <Text style={styles.inputLabel}>
@@ -402,10 +402,6 @@ export default function LoginRegisterScreen() {
               </Text>
             </Pressable>
         </View>
-        {/* <View>
-        <Text style={styles.supportText}>Need help? support@agrispark.co</Text>
-        <Text>Full_Year.NOw()</Text>
-        </View> */}
       </ScrollView>
     </SafeAreaView>
   );

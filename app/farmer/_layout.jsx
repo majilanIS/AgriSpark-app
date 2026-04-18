@@ -70,7 +70,6 @@ export default function FarmerTabsLayout() {
 
       <Tabs.Screen name="orders" />
       <Tabs.Screen name="Chatbox" />
-      {/* <Tabs.Screen name="profile" /> */}
     </Tabs>
   );
 }
