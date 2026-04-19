@@ -290,6 +290,9 @@ const styles = StyleSheet.create({
     padding: 18,
   },
   profilePhoto: {
+    width: 150,
+    height: 120,
+    borderRadius: 22,
     alignSelf: "center",
     marginBottom: 12,
     backfaceVisibility: "hidden",
