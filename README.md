@@ -46,19 +46,35 @@ Useful scripts:
 
 This repository includes a multi-stage Docker build that exports the Expo web app and serves it with Nginx.
 
+Before building, create a local `.env` file from `.env.example` and provide the Expo public Supabase values:
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+```
+
 Build image:
 
 ```bash
-docker build -t agrispark-web .
+docker compose build
 ```
 
 Run container:
 
 ```bash
-docker run --rm -p 8080:80 agrispark-web
+docker compose up
 ```
 
 Then open http://localhost:8080.
+
+If you prefer a one-off build command, the equivalent is:
+
+```bash
+docker build \
+	--build-arg EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL \
+	--build-arg EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY \
+	-t agrispark-web .
+```
 
 ## System Design and Flows
 
@@ -138,8 +154,7 @@ It enables direct product listing, bulk purchasing, and efficient order manageme
 
 * **Frontend:** React Native
 * **Backend:** Node.js (Express.js)
-* **Database:** MySQL
-
+* **Database:** Saas (Supabase)
 
 ## 🔄 Workflow
 
