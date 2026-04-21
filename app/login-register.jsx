@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../lib/supabaseClient";
@@ -36,6 +37,24 @@ export default function LoginRegisterScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const emailRedirectTo = Linking.createURL("/login-register", {
+    queryParams: { mode: "login" },
+  });
+
+  const ensureFreshAuthState = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const hasSession = !!sessionData?.session;
+
+    if (!hasSession) return;
+
+    const { data: authUserData, error: authUserError } = await supabase.auth.getUser();
+
+    // This happens when a user was deleted in Supabase Auth but a stale token is still cached locally.
+    if (authUserError || !authUserData?.user) {
+      await supabase.auth.signOut();
+    }
+  };
+
   const resolveUserRole = async (userId, fallbackRole) => {
   const { data } = await supabase
       .from("users")
@@ -46,21 +65,37 @@ export default function LoginRegisterScreen() {
     return data?.role || fallbackRole || "buyer";
   };
 
-  const syncUserProfile = async (user) => {
-    const meta = user.user_metadata || {};
+ const syncUserProfile = async (user) => {
+  const meta = user.user_metadata || {};
 
-    const profile = {
-      id: user.id,
-      full_name: meta.full_name || "",
-      email: user.email,
-      role: meta.role || "buyer",
-      phone_number: meta.phone_number || "",
-      business_name: meta.business_name || "",
-      location: meta.location || "",
-    };
-
-    await supabase.from("users").upsert(profile);
+  const profile = {
+    id: user.id,
+    full_name: meta.full_name || "",
+    email: user.email,
+    role: meta.role || "buyer",
+    phone_number: meta.phone_number || "",
+    business_name: meta.business_name || "",
+    location: meta.location || "",
   };
+
+  try {
+    const { data: existingUser, error } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!existingUser) {
+      await supabase.from("users").insert(profile);
+    } else {
+      await supabase.from("users").update(profile).eq("id", user.id);
+    }
+  } catch (err) {
+    console.log("Sync error:", err.message);
+  }
+};
 
   // const redirectByRole = (resolvedRole) => {
   //   if (resolvedRole === "farmer") {
@@ -82,6 +117,9 @@ export default function LoginRegisterScreen() {
     if (isAuthFormMode) {
       setMode(normalizedMode);
     }
+
+    // Keep local auth state clean when returning to auth screens.
+    ensureFreshAuthState();
 
     // Keep user on auth forms when they explicitly open login/register.
     // This prevents instant redirect from a previously cached session.
@@ -123,10 +161,15 @@ export default function LoginRegisterScreen() {
       setIsSubmitting(true);
 
       try {
+        await ensureFreshAuthState();
+
+        const normalizedEmail = registerEmail.trim().toLowerCase();
+
         const { data, error } = await supabase.auth.signUp({
-          email: registerEmail.trim().toLowerCase(),
+          email: normalizedEmail,
           password,
           options: {
+            emailRedirectTo,
             data: {
               full_name: fullName,
               role,
@@ -138,11 +181,31 @@ export default function LoginRegisterScreen() {
         });
 
         if (error) throw error;
+
+        const identityCount = data?.user?.identities?.length || 0;
+
+        if (identityCount === 0) {
+          const { error: resendError } = await supabase.auth.resend({
+            type: "signup",
+            email: normalizedEmail,
+            options: { emailRedirectTo },
+          });
+
+          if (resendError) throw resendError;
+
+          Alert.alert(
+            "Verification token sent",
+            "This account already exists. A new confirmation token was sent to your email."
+          );
+          setMode("login");
+          return;
+        }
+
         if (data?.user) {
           await syncUserProfile(data.user);
         }
 
-        Alert.alert("Success", "Check your email to verify account.");
+        Alert.alert("Success", "Check your email for the verification token.");
         setMode("login");
       } catch (err) {
         Alert.alert("Error", err.message);
@@ -158,6 +221,8 @@ export default function LoginRegisterScreen() {
     setIsSubmitting(true);
 
     try {
+      await ensureFreshAuthState();
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginIdentifier.trim().toLowerCase(),
         password,

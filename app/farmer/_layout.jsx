@@ -6,10 +6,10 @@ import { useRouter } from "expo-router";
 
 const iconByRoute = {
   home: "home",
-  products: "basket",   
+  products: "basket",
   create: "add-circle",
   orders: "cart",
-  chat: "chatbubble-ellipses",
+  Chatbox: "chatbubble-ellipses",
 };
 
 export default function FarmerTabsLayout() {
@@ -57,19 +57,20 @@ export default function FarmerTabsLayout() {
         },
       })}
     >
-      <Tabs.Screen name="home" />
-      <Tabs.Screen name="products" />
+      <Tabs.Screen name="home" options={{ title: "Home" }} />
+      <Tabs.Screen name="products" options={{ title: "Products" }} />
 
       {/* Create (Action Button, not real tab) */}
       <Tabs.Screen
         name="create"
+        options={{ title: "Create" }}
         listeners={{
           tabPress: (e) => e.preventDefault(),
         }}
       />
 
-      <Tabs.Screen name="orders" />
-      <Tabs.Screen name="Chatbox" />
+      <Tabs.Screen name="orders" options={{ title: "Orders" }} />
+      <Tabs.Screen name="Chatbox" options={{ title: "Chat" }} />
     </Tabs>
   );
 }

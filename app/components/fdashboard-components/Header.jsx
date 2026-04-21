@@ -60,20 +60,34 @@ export default function Header() {
         <Image source={require("../../../assets/images/logo-5.png")} style={styles.logo} />
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Open profile"
-        onPress={() => router.push("/Profile")}
-        style={({ pressed }) => [styles.profileButton, pressed && styles.pressed]}
-      >
-        {profileImageUrl ? (
-          <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
-        ) : (
-          <View style={styles.profileFallback}>
-            <Text style={styles.profileInitials}>{initials}</Text>
+      <View style={styles.headerActions}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open farmer orders"
+          onPress={() => router.push("/farmer/orders")}
+          style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+        >
+          <Ionicons name="notifications-outline" size={24} color="#2A2A2A" />
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>2</Text>
           </View>
-        )}
-      </Pressable>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open profile"
+          onPress={() => router.push("/Profile")}
+          style={({ pressed }) => [styles.profileButton, pressed && styles.pressed]}
+        >
+          {profileImageUrl ? (
+            <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.profileFallback}>
+              <Text style={styles.profileInitials}>{initials}</Text>
+            </View>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -84,8 +98,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // paddingHorizontal: 12,
-    paddingRight: 20,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
@@ -101,6 +114,37 @@ const styles = StyleSheet.create({
     width: 190,
     height: 190,
     resizeMode: "contain",
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F4F7F2",
+    position: "relative",
+  },
+  badge: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 999,
+    paddingHorizontal: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E2554A",
+  },
+  badgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "800",
   },
   profileButton: {
     width: 50,

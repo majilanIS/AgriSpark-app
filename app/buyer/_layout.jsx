@@ -4,9 +4,8 @@ import { StyleSheet, View } from "react-native";
 
 const iconByRoute = {
   home: "home",
-  products: "cube",
-  create: "add-circle",
   orders: "cart",
+  chatbot: "chatbubble-ellipses",
   profile: "person",
 };
 
@@ -45,8 +44,8 @@ export default function BuyerTabsLayout() {
     >
       <Tabs.Screen name="home" options={{ title: "Home" }} />
       <Tabs.Screen name="orders" options={{ title: "Orders" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
       <Tabs.Screen name="chatbot" options={{ title: "Chat" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
     </Tabs>
   );
 }

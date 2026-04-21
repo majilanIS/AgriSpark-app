@@ -1,27 +1,34 @@
 # AgriSpark
 
-AgriSpark is a React Native + Expo mobile app that connects farmers and bulk buyers (hotels, companies, wholesalers) for direct produce transactions.
+AgriSpark is an Expo + React Native app that connects farmers and bulk buyers for direct produce transactions. It includes separate farmer and buyer experiences, Supabase-backed authentication, product management, orders, and profile flows.
 
-## Objective
+## What It Does
 
-- Improve market access for farmers
-- Enable direct farmer-to-buyer transactions
-- Simplify bulk purchasing and order handling
-
-## Core Features
-
-- Authentication
-- Product management for farmers
-- Product browsing for buyers
-- Order management workflow
-- Admin oversight (planned)
+- Farmer onboarding and authentication
+- Buyer and farmer dashboards built with Expo Router
+- Farmer product creation, editing, and deletion
+- Buyer product browsing and order placement
+- Order tracking on both farmer and buyer sides
+- Password reset, profile management, settings, and logout
+- Supabase connection test screen for local verification
+- Landing page sections for product discovery, guidance, testimonials, and featured items
 
 ## Tech Stack
 
 - Frontend: React Native, Expo, Expo Router
 - Language: TypeScript
+- Backend and auth: Supabase
 
-## Local Development
+## Farmer Dashboard
+
+The farmer dashboard is the main control panel for farm activity. It gives farmers a quick view of their business and actions from one screen.
+
+- Welcome banner with the farmer name and location
+- Farm snapshot cards for active listings, orders today, stock value, and low stock items
+- Recent products list with image previews and stock status labels
+- Quick access to create listings, view orders, open chat, and manage products through the bottom tabs
+
+## Getting Started
 
 1. Install dependencies:
 
@@ -29,7 +36,14 @@ AgriSpark is a React Native + Expo mobile app that connects farmers and bulk buy
 npm install
 ```
 
-2. Start the Expo dev server:
+2. Create a local `.env` file from `.env.example` and set the Supabase values:
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+```
+
+3. Start the development server:
 
 ```bash
 npm run start
@@ -42,32 +56,19 @@ Useful scripts:
 - `npm run web`
 - `npm run lint`
 
-## Docker (Web Build)
+## Docker Web Build
 
-This repository includes a multi-stage Docker build that exports the Expo web app and serves it with Nginx.
+The repository includes a Docker setup that builds the Expo web app and serves it with Nginx.
 
-Before building, create a local `.env` file from `.env.example` and provide the Expo public Supabase values:
-
-```bash
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
-```
-
-Build image:
+Build and run with Docker Compose:
 
 ```bash
-docker compose build
+docker compose up --build
 ```
 
-Run container:
+Then open `http://localhost:8080`.
 
-```bash
-docker compose up
-```
-
-Then open http://localhost:8080.
-
-If you prefer a one-off build command, the equivalent is:
+If you prefer a direct build, pass the same Supabase variables as build args:
 
 ```bash
 docker build \
@@ -76,7 +77,7 @@ docker build \
 	-t agrispark-web .
 ```
 
-## System Design and Flows
+## System Flows
 
 ### Authentication Flow
 ![Authentication Flow](images/Authentication%20Flow.png)
@@ -95,97 +96,5 @@ docker build \
 
 ### Visual Design
 ![Visual Design](images/Visual-design.png)
-
-
-![GitHub stars](https://img.shields.io/github/stars/your-username/AgriSpark-App)
-![GitHub forks](https://img.shields.io/github/forks/your-username/AgriSpark-App)
-![License](https://img.shields.io/github/license/your-username/AgriSpark-App)
-
-# 🌾 AgriSpark
-
-## 📱 Overview
-
-AgriSpark is a mobile application built with **React Native** that connects **farmers** and **bulk buyers** (hotels, companies, wholesalers).
-It enables direct product listing, bulk purchasing, and efficient order management without intermediaries.
-
----
-
-## 🎯 Objective
-
-* Improve market access for farmers
-* Enable direct farmer–buyer transactions
-* Simplify bulk purchasing
-
----
-
-## 👥 User Roles
-
-### 🌾 Farmer
-
-* Register & login
-* Manage products (add, edit, delete)
-* Handle orders (accept/reject)
-
-### 🛍️ Buyer
-
-* Register & login
-* Browse products
-* Place bulk orders
-
-### 🏛️ Admin 
-
-* Manage users
-* Monitor products & orders
-
----
-
-## ⚙️ Core Features
-
-* 🔐 Authentication (JWT-based)
-* 🌾 Product Management (CRUD)
-* 🛍️ Product Browsing
-* 📦 Order Management
-* 💬 Chat System 
-* 🏛️ Admin Dashboard 
-
----
-
-## 🛠️ Tech Stack
-
-* **Frontend:** React Native
-* **Backend:** Node.js (Express.js)
-* **Database:** Saas (Supabase)
-
-## 🔄 Workflow
-
-1. User registers (Farmer / Buyer)
-2. Farmer lists products
-3. Buyer browses and orders
-4. Farmer accepts or rejects orders
-
-
-## 🎨 System Design & Flows
-
-Below are the main design and flow diagrams for AgriSpark:
-
-### Authentication Flow
-![Authentication Flow](images/Authentication%20Flow.png)
-
-### Buyer Browsing & Ordering Flow
-![Buyer Browsing & Ordering Flow](images/Buyer%20Browsing%20%26%20Ordering%20Flow.png)
-
-### Farmer Product Management Flow
-![Farmer Product Management Flow](images/Farmer%20Product%20Management%20Flow.png)
-
-### Order Management Flow (Farmer Side)
-![Order Management Flow (Farmer Side)](images/Order%20Management%20Flow%20(Farmer%20Side).png)
-
-### Full System End-to-End Flow
-![Full System End-to-End Flow](images/Full%20System%20End-to-End%20Flow.png)
-
-### Visual Design
-![Visual Design](images/Visual-design.png)
-
----
 
 
