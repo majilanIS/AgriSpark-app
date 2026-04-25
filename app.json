@@ -8,6 +8,9 @@
     "scheme": "agrisparkapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "updates": {
+      "checkAutomatically": "NEVER"
+    },
     "ios": {
       "supportsTablet": true
     },

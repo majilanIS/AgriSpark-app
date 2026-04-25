@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef} from "react";
 import {
   Alert,
   Image,
@@ -37,6 +37,8 @@ export default function LoginRegisterScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+
+  const inputRef = useRef(null);
   const emailRedirectTo = Linking.createURL("/login-register", {
     queryParams: { mode: "login" },
   });
@@ -153,10 +155,26 @@ export default function LoginRegisterScreen() {
   }, [initialMode, router]);
 
   const handleRegister = async () => {
-      if (!fullName || !registerEmail || !password || !confirmPassword) return;
+      if (!fullName || !registerEmail || !password || !confirmPassword) {
+          Alert.alert("Missing fields", "Please fill all required fields.");
+          return;
+        }
 
-      if (!emailRegex.test(registerEmail)) return;
-      if (password.length < 6) return;
+        if (!emailRegex.test(registerEmail)) {
+          Alert.alert("Invalid email", "Enter a valid email address.");
+          return;
+        }
+
+        if (password.length < 6) {
+          Alert.alert("Weak password", "Password must be at least 6 characters.");
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          Alert.alert("Mismatch", "Passwords do not match.");
+          return;
+        }
+
       if (password !== confirmPassword) return;
       setIsSubmitting(true);
 
@@ -342,7 +360,6 @@ export default function LoginRegisterScreen() {
                 value={registerEmail}
                 onChangeText={setRegisterEmail}
                 autoCapitalize="none"
-                keyboardType="default"
               />
 
               <Text style={styles.inputLabel}>
@@ -353,6 +370,7 @@ export default function LoginRegisterScreen() {
                 style={styles.input}
                 value={businessName}
                 onChangeText={setBusinessName}
+                autoCapitalize="default"
               />
 
               <Text style={styles.inputLabel}>Location</Text>
@@ -428,7 +446,15 @@ export default function LoginRegisterScreen() {
           <Pressable
             style={[styles.primaryButton, isSubmitting && styles.disabledButton]}
             disabled={isSubmitting}
-            onPress={mode === "login" ? handleLogin : handleRegister}
+            onPress={() => {
+              if (mode === "login") {
+                handleLogin();
+              } else {
+                handleRegister();
+              }
+
+              inputRef.current?.blur();
+            }}
           >
             <Text style={styles.primaryButtonText}>
               {isSubmitting

@@ -172,7 +172,7 @@ export default function FarmerProductsScreen() {
 
                 <View style={styles.cardBody}>
                   <Text style={styles.productName}>{item.name}</Text>
-                  <Text style={styles.productDescription} numberOfLines={3}>
+                  <Text style={styles.productDescription} numberOfLines={5}>
                     {item.description || "No description available."}
                   </Text>
                   <Text style={styles.price}>{formatPrice(item.price)}</Text>
@@ -184,9 +184,11 @@ export default function FarmerProductsScreen() {
                 </View>
               </View>
             );
+
           }}
         />
       )}
+
     </View>
   );
 }

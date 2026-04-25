@@ -1,6 +1,14 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
+import Header from "../components/fdashboard-components/Header";
 
 const iconByRoute = {
   home: "home",
@@ -9,36 +17,57 @@ const iconByRoute = {
   profile: "person",
 };
 
+function AnimatedTabIcon({ routeName, focused, color }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.15 : 1,
+      useNativeDriver: true,
+    }).start();
+  }, [focused, scale]);
+
+  const baseName = iconByRoute[routeName] || "ellipse";
+  const iconName = focused ? baseName : `${baseName}-outline`;
+
+  return (
+    <Animated.View style={{ alignItems: "center", transform: [{ scale }] }}>
+      <Ionicons name={iconName} size={24} color={color} />
+    </Animated.View>
+  );
+}
+
 export default function BuyerTabsLayout() {
   return (
     <Tabs
       screenOptions={({ route }) => ({
-        tabBarShowLabel: false,
+        header: () => <Header role="buyer" />,
+        headerShown: true,
+        tabBarShowLabel: true,
+        tabBarLabelPosition: "below-icon",
         tabBarActiveTintColor: "#0E698C",
-        tabBarInactiveTintColor: "#7892A0",
-        tabBarStyle: {
-          height: 74,
-          paddingTop: 10,
-          paddingBottom: 12,
-          paddingHorizontal: 8,
-          borderTopColor: "#DCECF5",
-          backgroundColor: "#FFFFFF",
-          borderTopWidth: 1,
-        },
+        tabBarInactiveTintColor: "#94A8B5",
+        tabBarStyle: styles.tabBar,
+        tabBarItemStyle: styles.tabItem,
+        tabBarIconStyle: styles.tabIcon,
+        tabBarLabelStyle: styles.tabLabel,
+        tabBarButton: (props) => (
+          <Pressable
+            {...props}
+            android_ripple={{ color: "#E8F3F8" }}
+            style={({ pressed }) => [
+              { flex: 1, opacity: pressed ? 0.65 : 1 },
+            ]}
+          />
+        ),
         tabBarIcon: ({ color, focused }) => {
-          const baseName = iconByRoute[route.name] || "ellipse";
-          const iconName = focused ? baseName : `${baseName}-outline`;
-
-          if (route.name === "create") {
-            return (
-              <View style={styles.fabWrap}>
-                <Ionicons name="add" size={34} color="#FFFFFF" />
-              </View>
-            );
-          }
-
-          const iconColor = route.name === "orders" ? "#E55648" : color;
-          return <Ionicons name={iconName} size={24} color={iconColor} />;
+          return (
+            <AnimatedTabIcon
+              routeName={route.name}
+              focused={focused}
+              color={color}
+            />
+          );
         },
       })}
     >
@@ -51,41 +80,34 @@ export default function BuyerTabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  headerBrand: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#0D4B6B",
-  },
-  headerActions: {
-    flexDirection: "row",
-    marginRight: 8,
-    gap: 6,
-  },
-  actionButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F1F8FC",
-  },
-  fabWrap: {
-    width: 58,
-    height: 58,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#08A64A",
-    marginTop: -28,
-    shadowColor: "#0A7E3F",
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+  tabBar: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    height: 72,
+    paddingTop: 8,
+    paddingBottom: 8,
+    backgroundColor: "#FFFFFF",
+    borderTopWidth: 0,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+
+    elevation: 10,
+  },
+  tabItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+  },
+  tabIcon: {
+    marginBottom: 2,
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

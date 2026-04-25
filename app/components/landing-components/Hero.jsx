@@ -1,6 +1,7 @@
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
+import Carousel from "./Carousel";
 
 const Hero = () => {
 	const router = useRouter();
@@ -11,17 +12,8 @@ const Hero = () => {
 			<Text style={styles.subtitle}>
 				Buy and sell quality agricultural products without middlemen.
 			</Text>
-			<View style={styles.heroImageWrap}>
-				<Image
-					source={require("../../../assets/images/agri_hero-1.jpg")}
-					style={styles.heroImage}
-				/>
-				<View style={styles.accentImageCard}>
-					<Image
-						source={require("../../../assets/images/agri_hero-2.jpg")}
-						style={styles.accentImage}
-					/>
-				</View>
+			<View style={styles.carouselWrap}>
+				<Carousel inHero />
 			</View>
 			<View style={styles.buttonRow}>
 				<Pressable
@@ -59,6 +51,7 @@ const styles = StyleSheet.create({
 		marginHorizontal: 16,
 		marginTop: 14,
 		padding: 18,
+		paddingBottom: 16,
 	},
 	title: {
 		color: "#143A1E",
@@ -72,39 +65,15 @@ const styles = StyleSheet.create({
 		lineHeight: 23,
 		marginTop: 10,
 	},
-	heroImageWrap: {
-		marginTop: 14,
-		position: "relative",
-	},
-	heroImage: {
-		borderRadius: 14,
-		height: 210,
-		width: "100%",
-	},
-	accentImageCard: {
-		backgroundColor: "#FFFFFF",
+	carouselWrap: {
+		marginTop: 16,
 		borderRadius: 16,
-		bottom: -16,
 		overflow: "hidden",
-		padding: 5,
-		position: "absolute",
-		right: 12,
-		shadowColor: "#11331C",
-		shadowOffset: { width: 0, height: 6 },
-		shadowOpacity: 0.2,
-		shadowRadius: 10,
-		elevation: 7,
-		width: "36%",
-	},
-	accentImage: {
-		borderRadius: 12,
-		height: 74,
-		width: "100%",
 	},
 	buttonRow: {
 		flexDirection: "row",
 		gap: 10,
-		marginTop: 30,
+		marginTop: 16,
 	},
 	primaryButton: {
 		backgroundColor: "#1E7A35",

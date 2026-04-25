@@ -148,8 +148,6 @@ export default function ProfilePhoto({ userId, fullName, photoUrl, onUpdated, st
               >
                 <Text style={styles.secondaryButtonText}>Cancel</Text>
               </Pressable>
-              <Text>Add Your Biography</Text>
-              <TextInput placeholder="Write something about yourself..." multiline style={{borderWidth:1, borderColor:"#ccc", borderRadius:8, padding:8, minHeight:80}} />
             </View>
           </View>
         </View>
@@ -162,19 +160,20 @@ const styles = StyleSheet.create({
   wrap: {
     width: 74,
     height: 74,
-    borderRadius: 22,
+    borderRadius: 999,
+    overflow: "hidden",
     marginBottom: 10,
   },
   photo: {
     width: "100%",
     height: "100%",
-    borderRadius: 22,
+    borderRadius: 999,
     backgroundColor: "rgba(255,255,255,0.1)",
   },
   fallbackPhoto: {
     width: "100%",
     height: "100%",
-    borderRadius: 22,
+    borderRadius: 999,
     backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",

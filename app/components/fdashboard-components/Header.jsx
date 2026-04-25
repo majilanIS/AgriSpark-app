@@ -17,10 +17,13 @@ const getInitials = (name) => {
     .toUpperCase();
 };
 
-export default function Header() {
+export default function Header({ role = "farmer" }) {
   const router = useRouter();
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [fullName, setFullName] = useState("");
+  const isBuyer = role === "buyer";
+  const ordersRoute = isBuyer ? "/buyer/orders" : "/farmer/orders";
+  const profileRoute = isBuyer ? "/buyer/profile" : "/Profile";
 
   const loadProfilePhoto = useCallback(async () => {
     const { data: authData } = await supabase.auth.getUser();
@@ -63,8 +66,8 @@ export default function Header() {
       <View style={styles.headerActions}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Open farmer orders"
-          onPress={() => router.push("/farmer/orders")}
+          accessibilityLabel={isBuyer ? "Open buyer orders" : "Open farmer orders"}
+          onPress={() => router.push(ordersRoute)}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
         >
           <Ionicons name="notifications-outline" size={24} color="#2A2A2A" />
@@ -76,7 +79,7 @@ export default function Header() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Open profile"
-          onPress={() => router.push("/Profile")}
+          onPress={() => router.push(profileRoute)}
           style={({ pressed }) => [styles.profileButton, pressed && styles.pressed]}
         >
           {profileImageUrl ? (
