@@ -241,5 +241,6 @@ http://localhost:8080
 AgriSpark aims to empower Ethiopian farmers through digital access to markets while helping buyers efficiently source agricultural products. The platform creates a transparent, scalable, and user-friendly ecosystem for agricultural commerce.
 
 
-For Information refer to the Documentation
+## For Information refer to the Documentation
+
 AgriSpark-Documentation copy.pdf
