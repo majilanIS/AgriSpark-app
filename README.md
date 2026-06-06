@@ -179,6 +179,8 @@ Create a `.env` file:
 ```env
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+EXPO_PUBLIC_GROQ_API_KEY=groq api key
+EXPO_PUBLIC_GEMINI_API_KEY=gemeni api key
 EXPO_PUBLIC_BACKEND_BASE_URL=http://127.0.0.1:8000
 EXPO_PUBLIC_CHATBOT_BASE_URL=http://127.0.0.1:8000
 ```
@@ -186,7 +188,7 @@ EXPO_PUBLIC_CHATBOT_BASE_URL=http://127.0.0.1:8000
 ### 3. Start Development Server
 
 ```bash
-npm run start
+npx expo start
 ```
 
 Useful commands:
@@ -213,30 +215,10 @@ Generate a production build:
 ```bash
 eas build -p android --profile production
 ```
-
----
-
-## Docker Deployment
-
-Build and run using Docker Compose:
-
-```bash
-docker compose up --build
-```
-
 Open:
 
 ```text
 http://localhost:8080
-```
-
-Build manually:
-
-```bash
-docker build \
-  --build-arg EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL \
-  --build-arg EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY \
-  -t agrispark-web .
 ```
 
 ---
@@ -257,3 +239,7 @@ docker build \
 ## Project Goal
 
 AgriSpark aims to empower Ethiopian farmers through digital access to markets while helping buyers efficiently source agricultural products. The platform creates a transparent, scalable, and user-friendly ecosystem for agricultural commerce.
+
+
+For Information refer to the Documentation
+AgriSpark-Documentation copy.pdf
