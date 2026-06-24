@@ -177,7 +177,7 @@ Create a `.env` file:
 ```env
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
-<<<<<<< HEAD
+
 EXPO_PUBLIC_GROQ_API_KEY=groq api key
 EXPO_PUBLIC_GEMINI_API_KEY=gemeni api key
 
