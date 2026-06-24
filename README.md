@@ -178,9 +178,6 @@ Create a `.env` file:
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
 
-EXPO_PUBLIC_GROQ_API_KEY=groq api key
-EXPO_PUBLIC_GEMINI_API_KEY=gemeni api key
-
 EXPO_PUBLIC_GROQ_API_KEY=your_groq_api_key
 EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
 ```
@@ -189,6 +186,10 @@ EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
 
 
 Useful commands:
+
+```bash
+npm expo start
+```
 
 ```bash
 npm run android
