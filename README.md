@@ -248,4 +248,4 @@ AgriSpark aims to empower Ethiopian farmers through digital access to markets wh
 
 ## For Information refer to the Documentation
 
-AgriSpark-Documentation copy.pdf
+AgriSpark-Documentation.pdf
