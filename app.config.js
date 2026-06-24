@@ -1,4 +1,5 @@
 module.exports = () => ({
+  owner: "chekole",
   name: "AgriSpark-app",
   slug: "agrispark-project",
   version: "1.0.0",

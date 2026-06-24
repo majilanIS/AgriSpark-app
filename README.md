@@ -65,14 +65,12 @@ Supported Languages:
 * React Native
 * Expo
 * Expo Router
-* TypeScript
 
 ### Backend
 
 * Supabase
 * Supabase Authentication
 * PostgreSQL Database
-* Express.js API
 
 ### Development Tools
 
@@ -179,16 +177,25 @@ Create a `.env` file:
 ```env
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+<<<<<<< HEAD
 EXPO_PUBLIC_GROQ_API_KEY=groq api key
 EXPO_PUBLIC_GEMINI_API_KEY=gemeni api key
 EXPO_PUBLIC_BACKEND_BASE_URL=http://127.0.0.1:8000
 EXPO_PUBLIC_CHATBOT_BASE_URL=http://127.0.0.1:8000
+=======
+EXPO_PUBLIC_GROQ_API_KEY=your_groq_api_key
+EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+>>>>>>> 3b4e68d (update README.md)
 ```
 
 ### 3. Start Development Server
 
 ```bash
+<<<<<<< HEAD
 npx expo start
+=======
+npm expo start
+>>>>>>> 3b4e68d (update README.md)
 ```
 
 Useful commands:
@@ -225,8 +232,6 @@ http://localhost:8080
 
 ## Future Enhancements
 
-* Push Notifications
-* Advanced Analytics Dashboard
 * Delivery Tracking
 * Voice-Based AI Assistant
 * Weather Information Integration
